@@ -1,2 +1,10 @@
 
 \.idea/
+
+__pycache__/
+
+\.DS_Store
+
+log_file\.txt
+
+new_log\.txt
