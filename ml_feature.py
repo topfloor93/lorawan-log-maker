@@ -1,13 +1,12 @@
 class Feature:
     def __init__(self):
-        self.duration = ""  #
         self.header_len = ""
-        self.arrival_time = ""  #
+        self.arrival_time = ""
         self.dev_eui = ""
         self.app_eui = ""
         self.direction = ""
         self.proto = ""
-        self.action = ""    #
+        self.action = ""
         self.lorawan_mac_hdr = ""
         self.lorawan_frm_hdr = ""
         self.payload = ""
@@ -27,9 +26,9 @@ class Feature:
         self.gwalti = ""
 
     def update_feature(self, _dict):
-        list = _dict.values()
         self.pktlen = len(_dict.get('PHYPayload'))/2
         phypayload = self.decode_lorawan(_dict.get('PHYPayload'))
+        self.arrival_time = _dict.get('createdTime')
         self.dev_eui = _dict.get('DevEUI')
         self.app_eui = _dict.get('AppEUI')
         self.fport = _dict.get('FPort')
@@ -56,6 +55,11 @@ class Feature:
         self.fctrl = phypayload['Fctrl']
         self.fcnt = phypayload['FCnt']
         self.fopts = phypayload['FOpts']
+
+        if int(self.payload, 16) > 14602888812300048:
+            self.action = 'Drop'
+        else:
+            self.action = 'Accept'
 
     def decode_lorawan(self, phypayload):
         macphyload = phypayload[2:int(self.pktlen)*2-8]

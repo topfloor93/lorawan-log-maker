@@ -1,4 +1,4 @@
-import ast
+import ast, json
 from ml_feature import Feature
 
 
@@ -9,11 +9,11 @@ def load_log():
     logs = file.readlines()
     for line in logs:
         str += line + ","
-    #str += file.readline() + ","
-    #str += file.readline() + ","
+    # str += file.readline() + ","
+    # str += file.readline() + ","
     file.close()
 
-    return str.replace('\n', ' ').replace('\r', '')
+    return str.replace('\n', '').replace('\r', '')
 
 
 def make_new_log(log):
@@ -22,16 +22,36 @@ def make_new_log(log):
     file.close()
 
 
+def str_list_indentation(str_list):
+    indent = 0
+    prefix = ['[', ']', '{', '}', ',']
+    res = ""
+    str_list = str(str_list).replace("\'", "\"").replace("\"{", "{").replace("}\"", "}").replace(" ", "")
+    for char in str_list:
+        if char in prefix:
+            if char == ']' or char == '}':
+                indent -= 1
+                res += "\n" + ("\t" * indent) + char
+            else:
+                if char == '[' or char == '{':
+                    indent += 1
+                res += char + "\n" + ("\t" * indent)
+        else:
+            res += char
+
+    return res
+
+
 if __name__ == "__main__":
 
-    res = ""
+    res = []
     log = load_log()
     dicts = ast.literal_eval(log)
     feature = Feature()
     for dict in dicts:
         feature.update_feature(dict)
-        res += str(feature.__dict__) + ", "
-    res = res[:len(res)-2]
-    make_new_log(res)
+        res.append(str(feature.__dict__))
+    new = str_list_indentation(res)
+    make_new_log(new)
 
 
